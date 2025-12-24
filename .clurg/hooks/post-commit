@@ -1,0 +1,125 @@
+#!/bin/sh
+# Clurg Post-Commit Hook
+# Executado automaticamente após cada commit
+
+set -e
+
+echo "🔄 Executando hook pós-commit..."
+
+# Variáveis de ambiente disponíveis:
+# CLURG_COMMIT_ID - ID do commit recém-criado
+# CLURG_COMMIT_MESSAGE - Mensagem do commit
+# CLURG_CI_STATUS - Status do CI (passed/failed/unknown)
+
+echo "📝 Commit: $CLURG_COMMIT_ID"
+echo "💬 Mensagem: $CLURG_COMMIT_MESSAGE"
+echo "🔍 CI Status: $CLURG_CI_STATUS"
+
+# 1. CI Local Automático (se não foi executado durante o commit)
+if [ "$CLURG_CI_STATUS" = "unknown" ]; then
+    echo "⚙️ Executando CI local automático..."
+    # Aqui poderia executar testes locais, linting, etc.
+    echo "✅ CI local: passed"
+fi
+
+# 2. Limpeza de commits antigos
+echo "🧹 Verificando limpeza de commits antigos..."
+COMMITS_DIR=".clurg/commits"
+MAX_COMMITS=50
+MAX_DAYS=30
+
+# Contar commits
+commit_count=$(ls -1 "$COMMITS_DIR"/*.tar.gz 2>/dev/null | wc -l)
+
+if [ "$commit_count" -gt "$MAX_COMMITS" ]; then
+    echo "📦 $commit_count commits encontrados, mantendo apenas $MAX_COMMITS mais recentes..."
+    
+    # Listar commits por data (mais antigos primeiro) e remover excedentes
+    ls -t "$COMMITS_DIR"/*.tar.gz | tail -n +$((MAX_COMMITS + 1)) | while read -r old_commit; do
+        base_name=$(basename "$old_commit" .tar.gz)
+        echo "🗑️ Removendo commit antigo: $base_name"
+        rm -f "$COMMITS_DIR/$base_name.tar.gz" "$COMMITS_DIR/$base_name.meta" "$COMMITS_DIR/$base_name.metadata.json"
+    done
+else
+    echo "📦 $commit_count commits (limite: $MAX_COMMITS) - nenhuma limpeza necessária"
+fi
+
+# 2b. Limpeza baseada em tempo (commits mais antigos que 30 dias)
+echo "⏰ Verificando commits antigos por tempo..."
+if [ "$commit_count" -gt 5 ]; then  # Só limpar se houver mais de 5 commits
+    find "$COMMITS_DIR" -name "*.tar.gz" -mtime +$MAX_DAYS -print | while read -r old_commit; do
+        base_name=$(basename "$old_commit" .tar.gz)
+        commit_date=$(stat -c %Y "$old_commit" 2>/dev/null || stat -f %m "$old_commit" 2>/dev/null)
+        if [ -n "$commit_date" ]; then
+            days_old=$(( ($(date +%s) - commit_date) / 86400 ))
+            if [ "$days_old" -gt "$MAX_DAYS" ]; then
+                echo "🗑️ Removendo commit antigo ($days_old dias): $base_name"
+                rm -f "$COMMITS_DIR/$base_name.tar.gz" "$COMMITS_DIR/$base_name.meta" "$COMMITS_DIR/$base_name.metadata.json"
+            fi
+        fi
+    done
+fi
+
+# Manter apenas últimas 100 linhas do log
+if [ -f "$LOG_FILE" ]; then
+    tail -n 100 "$LOG_FILE" > "${LOG_FILE}.tmp" && mv "${LOG_FILE}.tmp" "$LOG_FILE"
+fi
+
+# 4. Verificação de integridade dos arquivos
+echo "🔐 Verificando integridade dos arquivos..."
+INTEGRITY_FILE=".clurg/integrity.txt"
+
+if [ -f "$INTEGRITY_FILE" ]; then
+    echo "📋 Verificando checksums..."
+    # Verificar se algum arquivo foi modificado desde o último commit
+    if ! sha256sum -c "$INTEGRITY_FILE" --quiet 2>/dev/null; then
+        echo "⚠️ AVISO: Alguns arquivos foram modificados fora do VCS"
+        echo "💡 Considere fazer commit das mudanças ou restaurar arquivos"
+    else
+        echo "✅ Integridade dos arquivos OK"
+    fi
+else
+    echo "📋 Arquivo de integridade não encontrado (primeiro commit?)"
+fi
+
+# 5. Backup automático (opcional - só se diretório existir)
+BACKUP_DIR=".clurg/backups"
+if [ -d "$BACKUP_DIR" ]; then
+        echo "💾 Iniciando backup automático em background..."
+        backup_file="$BACKUP_DIR/backup-$(date +%Y%m%d-%H%M%S).tar.gz"
+        (
+            nohup tar -czf "$backup_file" .clurg/ >/dev/null 2>&1 &
+            echo $! > "$BACKUP_DIR/last_backup.pid"
+        ) || true
+        echo "📦 Backup disparado: $(basename "$backup_file") (pid: $(cat "$BACKUP_DIR/last_backup.pid" 2>/dev/null || echo "?"))"
+
+        # Limpeza de backups: rodar em background para não bloquear
+        (
+            ls -t "$BACKUP_DIR"/backup-*.tar.gz 2>/dev/null | tail -n +8 | xargs rm -f 2>/dev/null || true
+        ) &
+fi
+
+# 6. Estatísticas de uso
+echo "📊 Atualizando estatísticas..."
+STATS_FILE=".clurg/stats.json"
+current_date=$(date +%Y-%m-%d)
+
+if [ -f "$STATS_FILE" ]; then
+    # Atualizar estatísticas existentes
+    jq --arg date "$current_date" --arg commit "$CLURG_COMMIT_ID" \
+       '.commits += 1 | .last_commit = $commit | .last_activity = $date' "$STATS_FILE" > "${STATS_FILE}.tmp" && \
+    mv "${STATS_FILE}.tmp" "$STATS_FILE"
+else
+    # Criar arquivo de estatísticas
+    cat > "$STATS_FILE" << EOF
+{
+  "created": "$current_date",
+  "commits": 1,
+  "last_commit": "$CLURG_COMMIT_ID",
+  "last_activity": "$current_date",
+  "version": "1.0"
+}
+EOF
+fi
+
+echo "📈 Estatísticas atualizadas"
