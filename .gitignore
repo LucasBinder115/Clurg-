@@ -1,0 +1,24 @@
+# Binários compilados
+bin/
+
+# Objetos compilados (.o)
+*.o
+ci/*.o
+core/*.o
+web/*.o
+
+# Arquivos temporários do sistema
+.clurg/
+*.log
+
+# Arquivos de editor
+*~
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+

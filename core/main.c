@@ -5,6 +5,7 @@
 #include "push.h"
 #include "clone.h"
 #include "deploy.h"
+#include "db.h"
 
 static void usage(const char *prog_name) {
     printf("Uso: %s <comando> [opções]\n", prog_name);
@@ -14,6 +15,8 @@ static void usage(const char *prog_name) {
     printf("  clone <project> <remote_url> - Clonar projeto de repositório remoto\n");
     printf("  deploy <env> <commit_id>     - Deploy commit para ambiente específico\n");
     printf("  plugin <command>   - Gerenciar plugins (list, install, run)\n");
+    printf("  db-test            - Testar conexão com banco de dados\n");
+    printf("  db-first-commit    - Mostrar primeiro commit do banco de dados\n");
 }
 
 static int clurg_plugin(int argc, char *argv[]) {
@@ -93,6 +96,42 @@ int main(int argc, char *argv[]) {
         return clurg_deploy(argv[2], argv[3]);
     } else if (strcmp(argv[1], "plugin") == 0) {
         return clurg_plugin(argc - 2, argv + 2);
+    } else if (strcmp(argv[1], "db-test") == 0) {
+        if (db_init(".clurg/database.conf") != 0) {
+            return 1;
+        }
+        int result = db_test_connection();
+        db_close();
+        return result;
+    } else if (strcmp(argv[1], "db-first-commit") == 0) {
+        if (db_init(".clurg/database.conf") != 0) {
+            return 1;
+        }
+        
+        PGresult *res = db_read_first_commit();
+        if (!res) {
+            db_close();
+            return 1;
+        }
+        
+        int rows = PQntuples(res);
+        if (rows == 0) {
+            printf("📭 Nenhum commit encontrado no banco de dados\n");
+        } else {
+            printf("📋 Primeiro commit no banco de dados:\n");
+            printf("ID: %s\n", PQgetvalue(res, 0, 0));
+            printf("Project ID: %s\n", PQgetvalue(res, 0, 1));
+            printf("Commit Hash: %s\n", PQgetvalue(res, 0, 2));
+            printf("Message: %s\n", PQgetvalue(res, 0, 3));
+            printf("Author: %s\n", PQgetvalue(res, 0, 4));
+            printf("Timestamp: %s\n", PQgetvalue(res, 0, 5));
+            printf("Parent Hash: %s\n", PQgetvalue(res, 0, 6));
+            printf("Created At: %s\n", PQgetvalue(res, 0, 7));
+        }
+        
+        PQclear(res);
+        db_close();
+        return 0;
     } else {
         fprintf(stderr, "comando desconhecido: %s\n", argv[1]);
         usage(argv[0]);

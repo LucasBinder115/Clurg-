@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste Upload Completo - Clurg</title>
+</head>
+<body>
+    <h1>🧪 Teste de Upload Completo</h1>
+    <form action="http://localhost:8080/upload" method="post" enctype="multipart/form-data">
+        <p><strong>Projeto:</strong> <input type="text" name="project_name" value="teste-site-vendas" required></p>
+        <p><strong>Mensagem:</strong> <input type="text" name="message" value="Upload completo do site de vendas" required></p>
+        <p><strong>Arquivos:</strong> <input type="file" name="files" multiple required></p>
+        <p><input type="submit" value="🚀 Fazer Upload Completo"></p>
+    </form>
+    <hr>
+    <p><a href="http://localhost:8080/projects">📁 Ver Projetos</a></p>
+</body>
+</html>

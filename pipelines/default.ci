@@ -1,0 +1,10 @@
+pipeline "clurg-core"
+
+step "build" {
+  run: "make"
+}
+
+step "lint" {
+  run: "gcc -Wall -Wextra core/*.c"
+}
+

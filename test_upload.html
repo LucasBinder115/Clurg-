@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste Upload Clurg</title>
+</head>
+<body>
+    <h1>Teste Upload</h1>
+    <form action="http://localhost:8080/upload" method="post" enctype="multipart/form-data">
+        <label>Projeto: <input type="text" name="project_name" value="teste-upload"></label><br>
+        <label>Mensagem: <input type="text" name="message" value="Teste de upload via web"></label><br>
+        <label>Arquivo: <input type="file" name="files" multiple></label><br>
+        <input type="submit" value="Upload">
+    </form>
+</body>
+</html>

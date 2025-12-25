@@ -1,0 +1,52 @@
+# Clurg Cron Jobs Configuration
+# Este arquivo mostra como configurar tarefas automatizadas para o Clurg
+#
+# Para instalar: crontab -e
+# Adicione as linhas abaixo (ajuste os caminhos conforme necessário)
+
+# ====================================================================
+# CONFIGURAÇÃO RECOMENDADA PARA CLURG
+# ====================================================================
+
+# Manutenção diária às 2:00 AM
+# Limpa commits antigos, otimiza logs, verifica integridade
+0 2 * * * /home/Lucas/projetos/clurg/scripts/maintenance.sh >> /home/Lucas/projetos/clurg/.clurg/logs/maintenance.log 2>&1
+
+# Backup semanal aos domingos às 3:00 AM
+# Cria backup completo do repositório
+0 3 * * 0 /home/Lucas/projetos/clurg/scripts/backup.sh >> /home/Lucas/projetos/clurg/.clurg/logs/backup.log 2>&1
+
+# Verificação de integridade a cada 6 horas
+# Alerta se arquivos foram modificados fora do VCS
+0 */6 * * * /home/Lucas/projetos/clurg/scripts/integrity-check.sh >> /home/Lucas/projetos/clurg/.clurg/logs/integrity.log 2>&1
+
+# Relatório semanal aos domingos às 6:00 AM
+# Envia estatísticas por email (se configurado)
+0 6 * * 0 /home/Lucas/projetos/clurg/scripts/weekly-report.sh >> /home/Lucas/projetos/clurg/.clurg/logs/report.log 2>&1
+
+# ====================================================================
+# SCRIPTS NECESSÁRIOS
+# ====================================================================
+#
+# maintenance.sh     - Já criado, faz limpeza geral
+# backup.sh          - Criar: backup completo automatizado
+# integrity-check.sh - Criar: verificação contínua de integridade
+# weekly-report.sh   - Criar: relatório semanal com estatísticas
+#
+# ====================================================================
+# LOGS GERADOS
+# ====================================================================
+#
+# .clurg/logs/maintenance.log  - Log da manutenção diária
+# .clurg/logs/backup.log       - Log dos backups semanais
+# .clurg/logs/integrity.log    - Log das verificações de integridade
+# .clurg/logs/report.log       - Log dos relatórios semanais
+#
+# ====================================================================
+# PERSONALIZAÇÃO
+# ====================================================================
+#
+# - Ajuste os caminhos para o seu ambiente
+# - Modifique os horários conforme necessário
+# - Configure notificações por email se desejar
+# - Adapte os scripts para suas necessidades específicas

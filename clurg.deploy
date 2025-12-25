@@ -1,0 +1,12 @@
+# Ambiente: staging
+# Comando para deploy
+deploy: echo "Deploying to staging..." && sleep 1 && echo "Staging deploy complete"
+# Comando para verificar saúde
+healthcheck: echo "Checking staging health..." && sleep 1 && echo "Staging is healthy"
+# Timeout em segundos
+timeout: 30
+
+# Ambiente: production
+deploy: echo "Deploying to production..." && sleep 2 && echo "Production deploy complete"
+healthcheck: echo "Checking production health..." && sleep 1 && echo "Production is healthy"
+timeout: 60
