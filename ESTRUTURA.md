@@ -9,7 +9,6 @@ clurg/
 ├── bin/                    # Binários compilados (NÃO versionado)
 │   ├── clurg              # Comando principal do Clurg
 │   ├── clurg-ci           # Executor de pipelines CI
-│   └── clurg-web          # Servidor web
 │
 ├── ci/                     # Sistema de CI/CD
 │   ├── ci.h               # Header com estruturas de dados

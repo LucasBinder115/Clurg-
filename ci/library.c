@@ -9,12 +9,6 @@
 
 #define MAX_PATH 512
 
-static void usage(const char *prog_name) {
-  fprintf(stderr, "Uso: %s run [pipeline.ci]\n", prog_name);
-  fprintf(stderr, "  run: executar pipeline\n");
-  fprintf(stderr, "  [pipeline.ci]: arquivo de pipeline (padrão: pipelines/default.ci)\n");
-}
-
 static char *get_clurg_root(void) {
   static char root[PATH_MAX];
   char cwd[PATH_MAX];
@@ -47,38 +41,26 @@ static char *get_clurg_root(void) {
   }
 }
 
-int main(int argc, char *argv[]) {
+int ci_run_pipeline(const char *pipeline_file, const char *repo_root) {
   ci_pipeline_t pipeline;
-  char config_file[MAX_PATH];
   char workspace_path[MAX_PATH];
   char log_dir[MAX_PATH];
-  char *clurg_root;
   int i;
   int ret = 0;
 
-  if (argc < 2 || strcmp(argv[1], "run") != 0) {
-    usage(argv[0]);
-    return 1;
-  }
-
-  /* Determinar arquivo de pipeline */
-  if (argc >= 3) {
-    strncpy(config_file, argv[2], sizeof(config_file) - 1);
-    config_file[sizeof(config_file) - 1] = '\0';
-  } else {
-    strncpy(config_file, "pipelines/default.ci", sizeof(config_file) - 1);
-    config_file[sizeof(config_file) - 1] = '\0';
-  }
-
-  /* Encontrar raiz do projeto Clurg */
-  clurg_root = get_clurg_root();
-  if (!clurg_root) {
-    fprintf(stderr, "erro: não foi possível determinar raiz do projeto\n");
-    return 1;
-  }
-
   /* Preparar diretório de logs */
-  snprintf(log_dir, sizeof(log_dir), "%s/.clurg/ci/logs", clurg_root);
+  if (repo_root) {
+    snprintf(log_dir, sizeof(log_dir), "%s/.clurg/ci/logs", repo_root);
+  } else {
+    /* Fallback: procurar .clurg subindo na árvore */
+    char *root = get_clurg_root();
+    if (root) {
+      snprintf(log_dir, sizeof(log_dir), "%s/.clurg/ci/logs", root);
+    } else {
+      fprintf(stderr, "erro: não foi possível determinar raiz do projeto\n");
+      return 1;
+    }
+  }
 
   /* Inicializar logger */
   if (logger_init(log_dir) != 0) {
@@ -87,8 +69,8 @@ int main(int argc, char *argv[]) {
   }
 
   /* Parsear pipeline */
-  if (config_parse(config_file, &pipeline) != 0) {
-    fprintf(stderr, "erro ao parsear pipeline: %s\n", config_file);
+  if (config_parse(pipeline_file, &pipeline) != 0) {
+    fprintf(stderr, "erro ao parsear pipeline: %s\n", pipeline_file);
     logger_cleanup();
     return 1;
   }
@@ -105,7 +87,7 @@ int main(int argc, char *argv[]) {
   }
 
   /* Setup workspace - copiar estado do repo */
-  if (workspace_setup(workspace_path, clurg_root) != 0) {
+  if (repo_root && workspace_setup(workspace_path, repo_root) != 0) {
     fprintf(stderr, "erro ao configurar workspace\n");
     workspace_cleanup(workspace_path);
     config_free(&pipeline);

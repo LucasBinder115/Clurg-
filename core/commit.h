@@ -4,4 +4,3 @@
 int clurg_commit(const char *message);
 
 #endif /* COMMIT_H */
-

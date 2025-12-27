@@ -1,351 +1,225 @@
-# Clurg — CI/CD Nativo (todo-cicd.md)
+TODO.md — FASE 15
+Finalização do Core do Clurg (CLI + Versionamento + Deploy)
 
-> *Pipeline simples, previsível e sob teu controle.*
-> Nada de YAML mágico, nada de cloud. Só Linux, C e bom senso.
+Objetivo:
+Remover completamente a camada web e consolidar o Clurg como um sistema educacional de versionamento e deploy via CLI, inspirado no Git.
 
----
+🧹 1. REMOÇÃO TOTAL DA CAMADA WEB (DESACOPLAMENTO)
+Deletar código e artefatos web
 
-## Visão do CI/CD do Clurg
+Remover diretório web/
 
-No Clurg:
+Remover binário clurg-web do Makefile
 
-* **Commit gera snapshot**
-* **Snapshot dispara pipeline**
-* **Pipeline gera logs**
-* **Logs viram histórico**
+Remover targets relacionados a web (make clurg-web)
 
-Sem branches, sem matrix, sem segredo.
+Remover documentação relacionada a web:
 
----
+Referências no README
 
-## FASE 9 — POLIMENTO DA INTERFACE ✅ COMPLETA
+Referências em architecture.md (se existir)
 
-### ✅ Melhorias Implementadas
+Remover scripts auxiliares que só fazem sentido para web
 
-**Dark Mode Nativo:**
-- CSS Variables para temas consistentes
-- Detecção automática de preferência do sistema
-- Transições suaves entre light/dark
+Validar build sem qualquer dependência web
 
-**Layout Responsivo:**
-- Mobile-first approach
-- Breakpoints otimizados (768px, 480px)
-- Componentes adaptáveis
+✅ Resultado esperado:
 
-**Performance:**
-- CSS crítico inline
-- Estrutura HTML semântica
-- Carregamento otimizado
+O projeto não compila, não referencia e não depende de servidor HTTP.
 
-**Acessibilidade:**
-- Contraste adequado (WCAG AA)
-- Navegação por teclado
-- Screen reader friendly
+🧠 2. CONSOLIDAÇÃO DO CORE DE VERSIONAMENTO (CLI)
+Estrutura base
 
-### 📱 Páginas Atualizadas
-- ✅ Dashboard principal
-- ✅ Página de métricas  
-- ✅ Listagem de projetos
-- ✅ Detalhes de commit
-- ✅ Listagem de commits
+Garantir .clurg/ como única fonte de controle
 
-### 🎨 Sistema de Design
-- Variáveis CSS consistentes
-- Paleta de cores profissional
-- Tipografia otimizada
-- Componentes reutilizáveis
+Garantir commits como snapshots imutáveis (.tar.gz)
 
----
+HEAD como ponteiro simples
 
-## 🎯 PRÓXIMA FASE: FASE 10 — DEPLOY AUTOMÁTICO ✅ IMPLEMENTADA
+Comandos obrigatórios (estilo Git)
+clurg init
 
-### ✅ Funcionalidades Implementadas
+Criar estrutura .clurg/
 
-**🚀 Comando Deploy:**
-- Comando `clurg deploy <environment> <commit_id>` funcional
-- Configuração via arquivo `clurg.deploy` simples
-- Suporte a múltiplos ambientes (staging, production)
+Criar diretórios:
 
-**📦 Processo de Deploy:**
-- Backup automático antes de mudanças
-- Extração de commits para diretórios de deploy
-- Execução de comandos customizáveis
-- Healthcheck para validação
+commits/
 
-**📊 Logs e Rastreamento:**
-- Logs detalhados de cada deploy
-- Status de sucesso/falha
-- Histórico completo em arquivos
+logs/
 
-**🔧 Configuração Flexível:**
-- Comandos de deploy customizáveis
-- Healthchecks configuráveis
-- Timeouts ajustáveis por ambiente
+deploy/
 
-### 🎯 Resultados Alcançados
+Criar arquivo HEAD
 
-- ✅ **Deploy básico funcionando** - Comando executa e registra logs
-- ✅ **Configuração por ambiente** - Staging e production suportados
-- ✅ **Backup automático** - Estado anterior preservado
-- ✅ **Logs detalhados** - Rastreamento completo de operações
-- ✅ **Healthcheck integrado** - Validação pós-deploy
+Proteger permissões básicas
 
-### 📋 Limitações Atuais
+clurg status
 
-- Deploy funciona apenas com commits locais
-- Não há integração automática com CI
-- Interface web não mostra status de deploy
-- Não há rollback automático em falha
+Verificar se repositório está inicializado
 
----
+Mostrar commit atual (HEAD)
 
-## 🎯 PRÓXIMA FASE: FASE 11 — API REST COMPLETA
+Indicar estado limpo ou modificado (simplificado)
 
-### Visão da API REST
+Mensagem clara para iniciantes
 
-O Clurg deve oferecer:
+clurg add .
 
-* **API RESTful completa** para todas as operações
-* **Autenticação segura** com tokens
-* **Documentação automática** (OpenAPI/Swagger)
-* **Integração com ferramentas** externas
-* **Webhooks para eventos** (commit, deploy, CI)
+Registrar arquivos para o próximo commit
 
-### Funcionalidades Planejadas
+Implementação simples (snapshot-based)
 
-**Endpoints Principais:**
-- `GET/POST /projects` - Gerenciar projetos
-- `GET/POST /commits` - Operações com commits
-- `POST /deploy` - Gatilho de deploy
-- `GET /status` - Status do sistema
+Sem staging complexo (educacional)
 
-**Segurança:**
-- Autenticação por token
-- Controle de permissões
-- Rate limiting
-- Logs de auditoria
+Preparar lista de arquivos para commit
 
-**Integração:**
-- Webhooks para eventos
-- API compatível com Git
-- Suporte a CI/CD externo
+clurg commit -m "mensagem"
 
----
+Criar snapshot completo do projeto
 
-## Princípios (não quebre isso)
+Gerar ID único do commit
 
-1. Pipeline deve ser **determinístico**
-2. Falhou → registra → segue a vida
-3. Nada roda como root
-4. Logs são imutáveis
-5. Simples > completo
+Salvar:
 
----
+<id>.tar.gz
 
-## Estrutura de Diretórios
+<id>.meta (mensagem, timestamp)
 
-```
-.clurg/
-├── projects/
-│   └── meu-projeto/
-│       ├── commits/
-│       ├── ci/
-│       │   ├── runs/
-│       │   │   ├── ci_20251222_210012.log
-│       │   └── last_status
-│       ├── clurg.ci
-│       └── metadata.json
-```
+Atualizar HEAD
 
----
+Executar hooks (se existirem)
 
-## Arquivo de Pipeline (`clurg.ci`)
+clurg log
 
-Formato propositalmente simples:
+Listar commits em ordem cronológica
 
-```
-# cada linha é um comando
-# falha se retornar != 0
+Mostrar:
 
-make clean
-make
-./bin/test
-```
+ID
 
-Sem YAML. Sem parser complexo.
+Data
 
----
+Mensagem
 
-## Parte 1 — Disparo Automático
+Saída simples e legível
 
-### Quando roda?
+clurg show <commit>
 
-* Após `clurg commit`
-* Após `clurg push` (opcional)
+Mostrar metadados do commit
 
-### Fluxo
+Exibir:
 
-1. Commit criado
-2. Snapshot extraído em diretório temporário
-3. Pipeline executado ali
-4. Logs salvos
-5. Status gravado
+Mensagem
 
----
+Timestamp
 
-## Parte 2 — Execução do Pipeline
+Lista de arquivos (opcional)
 
-### Execução
+Não extrair arquivos
 
-* `fork()`
-* `execvp()`
-* `waitpid()`
+clurg checkout <commit>
 
-Cada linha do `clurg.ci` vira um processo.
+Restaurar snapshot do commit informado
 
-### Regras
+Atualizar working directory
 
-* stdout + stderr → log
-* Se um comando falhar:
+Atualizar HEAD
 
-  * marca FAIL
-  * interrompe pipeline
+Aviso claro de overwrite de arquivos
 
----
+🚀 3. DEPLOY — SOMENTE O NECESSÁRIO (SEM EXCESSO)
+Manter apenas comandos essenciais
+clurg deploy --help
 
-## Parte 3 — Logs de CI
+Ajuda clara e didática
 
-### Nome do log
+Exemplos de uso
 
-```
-ci_YYYYMMDD_HHMMSS.log
-```
+Explicação educacional
 
-### Conteúdo
+clurg deploy status
 
-```
-[START] 2025-12-22 21:00:12
-[CMD] make clean
-[OK]
-[CMD] make
-[OK]
-[CMD] ./bin/test
-[FAIL] code=1
-[END] FAIL
-```
+Listar ambientes configurados
 
----
+Mostrar commit ativo por ambiente
 
-## Parte 4 — Status por Commit
+Indicar lock ativo ou não
 
-Arquivo simples:
+clurg deploy run <env>
 
-```
-.clurg/projects/meu-projeto/ci/last_status
-```
+Executar fluxo completo:
 
-Conteúdo:
+Backup
 
-```
-OK
-```
+Deploy
 
-ou
+Healthcheck
 
-```
-FAIL
-```
+Switch de symlink
 
----
+Registrar log do deploy
 
-## Parte 5 — Integração com UI
+clurg deploy run <env> <commit>
 
-### Página de projeto mostra:
+Deploy reprodutível
 
-* último status CI
-* lista de logs
-* data
+Ignorar commits mais novos
 
-Visual:
+Garantir integridade do snapshot
 
-```
-🟢 OK   ci_20251222_210012.log
-🔴 FAIL ci_20251221_195932.log
-```
+clurg deploy rollback <env>
 
----
+Restaurar último snapshot válido
 
-## Parte 6 — Segurança Básica
+Atualizar symlink current
 
-* Executar como usuário dedicado `clurg`
-* Diretório temporário com permissões restritas
-* Timeout por comando (futuro)
+Registrar rollback em log
 
----
+clurg deploy rollback <env> <snapshot>
 
-## Parte 7 — CLI Auxiliar
+Rollback exato para snapshot informado
 
-### Ver status
+Não depender de banco, CI ou rede
 
-```
-clurg ci status
-```
+clurg deploy lock <env>
 
-### Rodar manual
+Impedir novos deploys
 
-```
-clurg ci run
-```
+Criar lockfile explícito
 
----
+clurg deploy unlock <env>
 
-## Parte 8 — Limpeza Automática
+Remover lock manualmente
 
-* Manter últimos N logs
-* Apagar mais antigos
-* Nunca apagar commits
+🧩 4. LIMPEZA FINAL DO PROJETO
 
----
+Remover código morto
 
-## Fase Seguinte (depois do CI)
+Remover scripts não utilizados
 
-* Banco de dados para indexar resultados
-* UI mais rica
-* Deploy automático
+Revisar Makefile
 
----
+Garantir make all limpo
 
-## Encerramento
+Atualizar README final
 
-O CI do Clurg não é rápido.
-Ele é **honesto**.
+Atualizar CHANGELOG (encerramento)
 
-> *Se passou, passou de verdade.*
-> *Se falhou, alguém vai saber.*
+🏁 5. ENCERRAMENTO OFICIAL
 
----
+Commit final: Finalize Clurg v1.0 (educational)
 
----
+Tag:
 
-## 📋 Roadmap Atualizado
+git tag v1.0-educational
 
-### ✅ FASES CONCLUÍDAS
-- **FASE 0-7**: Core VCS (clone, commit, push, etc.)
-- **FASE 8**: Sistema de plugins
-- **FASE 9**: Polimento da interface
-- **FASE 10**: Deploy automático
 
-### 🔄 FASE ATUAL
-- **FASE 11**: API REST completa (próxima)
+Projeto congelado (somente manutenção)
 
-### 📅 FASES FUTURAS
-- **FASE 12**: Multi-tenancy
-- **FASE 13**: Integrações externas
+🧠 Nota Final
 
----
+Clurg não é sobre features.
+É sobre entender como as coisas realmente funcionam.
 
-Próximo possível documento:
-
-* `todo-db.md`
-* `todo-ui-brand.md`
-* `todo-deploy.md`
+Fase 15 é o ponto final.
+Depois disso, o projeto cumpriu seu papel. e finalizamos o projeto, só vamos ficar para polir o projeto. 

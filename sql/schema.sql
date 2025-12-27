@@ -25,6 +25,9 @@ CREATE TABLE IF NOT EXISTS clurg.commits (
     author VARCHAR(255),
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     parent_hash VARCHAR(64),
+    size_bytes BIGINT,
+    checksum VARCHAR(128),
+    ci_status VARCHAR(32),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

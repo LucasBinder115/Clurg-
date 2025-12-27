@@ -1,0 +1,11 @@
+# Crontab entries for Clurg GC Monitor
+# Adicionar ao crontab do sistema: crontab -e
+
+# Executar GC monitor a cada 6 horas
+0 */6 * * * /home/Lucas/projetos/clurg/scripts/gc-monitor.sh
+
+# Ou executar diariamente às 2:00 AM
+# 0 2 * * * /home/Lucas/projetos/clurg/scripts/gc-monitor.sh
+
+# Para debug, executar a cada 5 minutos (remover depois):
+# */5 * * * * /home/Lucas/projetos/clurg/scripts/gc-monitor.sh

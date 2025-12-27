@@ -7,7 +7,6 @@
 A estrutura está organizada e coerente:
 - `core/` - Núcleo do sistema
 - `ci/` - Sistema de CI/CD  
-- `web/` - Servidor web
 - `pipelines/` - Arquivos de pipeline
 - `bin/` - Binários compilados (não versionado)
 - `.clurg/` - Diretório de controle (não versionado)

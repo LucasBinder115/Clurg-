@@ -2,18 +2,40 @@
 
 Scripts de teste para validar funcionalidades do Clurg.
 
-## Script de Teste Básico
+## Scripts de Teste
+
+### Testes Básicos (`run_basic.sh`)
 
 O script `run_basic.sh` executa uma suíte de testes básicos para verificar se as funcionalidades principais estão funcionando.
 
-### Como Executar
+### Testes Abrangentes (`run_comprehensive.sh`)
+
+O script `run_comprehensive.sh` executa testes mais completos incluindo:
+- Testes unitários e de integração
+- Validação de qualidade de código (linting e formatação)
+- Testes de funcionalidades avançadas
+- Verificação de estrutura de arquivos
+
+## Como Executar
 
 ```bash
 cd /home/Lucas/projetos/clurg
+
+# Testes básicos
 ./tests/run_basic.sh
+
+# Testes abrangentes
+./tests/run_comprehensive.sh
+
+# Via Makefile
+make test-basic    # Testes básicos
+make test          # Testes abrangentes
+make quality       # Linting + formatação + testes
 ```
 
-### O que é Testado
+## O que é Testado
+
+### Testes Básicos
 
 1. **Compilação**
    - Verifica se `make all` compila sem erros
@@ -42,11 +64,24 @@ cd /home/Lucas/projetos/clurg
    - Verifica existência de arquivos essenciais
    - Pipeline padrão, Makefile, README
 
-### Saída
+### Testes Abrangentes (Adicionais)
 
-O script mostra:
+7. **Qualidade de Código**
+   - Linting com clang-tidy
+   - Verificação de formatação com clang-format
+
+8. **Funcionalidades Avançadas**
+   - Testes de pipeline com falha
+   - Inicialização do servidor web
+   - Conectividade com PostgreSQL
+   - Validação de configuração de deploy
+
+## Saída
+
+Os scripts mostram:
 - ✓ Testes que passaram (verde)
 - ✗ Testes que falharam (vermelho)
+- ⚠ Testes pulados (amarelo, quando dependências não estão disponíveis)
 - Resumo final com contagem de testes
 
 ### Notas

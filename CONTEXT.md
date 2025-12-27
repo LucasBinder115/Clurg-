@@ -43,12 +43,6 @@ Forte o suficiente para escalar mentalmente
 └─────┬────────┘
       │
       ▼
-┌──────────────┐
-│ clurg-web    │   (visualização)
-├──────────────┤
-│ servidor HTTP│   (sockets)
-│ visualização │   (logs de CI)
-└──────────────┘
 
 
 Nada distribuído por enquanto.
@@ -68,13 +62,12 @@ clurg/
 │   ├── logger.c          # logs estruturados
 │   └── ci.h
 ├── web/
-│   └── server.c          # servidor HTTP em C puro
+│   └── (removido)
 ├── pipelines/
 │   └── default.ci
 ├── bin/
 │   ├── clurg
-│   ├── clurg-ci
-│   └── clurg-web
+│   └── clurg-ci
 
 📜 PIPELINE COMO CONTRATO (SEM YAML)
 
@@ -190,17 +183,10 @@ Formato simples:
 [2025-01-12 20:14:03] build: OK
 [2025-01-12 20:14:05] test: FAIL (exit 1)
 
-5️⃣ Servidor Web (web/server.c)
+5️⃣ Interface (CLI)
 
-Servidor HTTP simples em C puro
-
-Sockets TCP/IP
-
-Sem dependências externas
-
-Visualização de logs de CI
-
-Interface HTML minimalista
+Logs acessíveis via `clurg log` e arquivos em `.clurg/logs`.
+Sem interface web.
 
 🔗 INTEGRAÇÃO COM O CLURG
 
@@ -267,9 +253,7 @@ Execução local, previsível, auditável
 
 Logs como artefato histórico (igual commits)
 
-Interface web própria (clurg-web) para visualização
-
-Servidor HTTP implementado do zero em C
+Interface puramente CLI
 
 Isso é como os sistemas eram feitos antes da nuvem — e por isso mesmo, você aprende o que importa.
 

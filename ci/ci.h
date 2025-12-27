@@ -9,14 +9,14 @@
 #define MAX_PIPELINE_NAME 64
 
 typedef struct {
-    char name[MAX_STEP_NAME];
-    char command[MAX_COMMAND];
+  char name[MAX_STEP_NAME];
+  char command[MAX_COMMAND];
 } ci_step_t;
 
 typedef struct {
-    char name[MAX_PIPELINE_NAME];
-    ci_step_t steps[MAX_STEPS];
-    size_t step_count;
+  char name[MAX_PIPELINE_NAME];
+  ci_step_t steps[MAX_STEPS];
+  size_t step_count;
 } ci_pipeline_t;
 
 /* Logger */
@@ -36,5 +36,7 @@ void config_free(ci_pipeline_t *pipeline);
 /* Executor */
 int executor_run_step(const ci_step_t *step, const char *workspace_path);
 
-#endif /* CI_H */
+/* High-level API for library usage */
+int ci_run_pipeline(const char *pipeline_file, const char *repo_root);
 
+#endif /* CI_H */
