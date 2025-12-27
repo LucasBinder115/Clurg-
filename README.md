@@ -193,15 +193,9 @@ Ou adicione ao seu PATH manualmente:
 export PATH=$PATH:$(pwd)/bin
 ```
 
+## Licença
 
-Projeto educacional.
-Use, estude, modifique e aprenda.
+Este projeto é distribuído sob a licença **BSD 2-Clause**.
 
-Não recomendado para produção.
-
-    Clurg existe para ensinar.
-    O código é simples porque o entendimento precisa ser profundo.
-
-
-
-git tag v1.0-educational
+O objetivo é educacional: aprender fundamentos de sistemas de versionamento,
+CI/CD, automação e programação em C.
