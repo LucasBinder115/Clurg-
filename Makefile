@@ -65,6 +65,23 @@ $(BIN_DIR):
 clean:
 	rm -f $(CORE_OBJECTS) $(CI_OBJECTS)
 	rm -f $(CLURG) $(CLURG_CI)
+	rm -f $(BIN_DIR)/libci.a
+
+# Instalação
+PREFIX ?= /usr/local
+BINDIR ?= $(PREFIX)/bin
+
+install: clurg
+	@echo "Instalando clurg em $(BINDIR)..."
+	@install -d $(BINDIR)
+	@install $(CLURG) $(BINDIR)
+	@echo "Instalação concluída. Tente rodar: clurg --help"
+
+uninstall:
+	@echo "Removendo clurg de $(BINDIR)..."
+	@rm -f $(BINDIR)/clurg
+	@echo "Desinstalação concluída."
+
 
 test: $(CLURG_CI)
 	@echo "Executando pipeline de teste..."

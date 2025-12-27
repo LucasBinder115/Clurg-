@@ -5,7 +5,6 @@ bin/
 *.o
 ci/*.o
 core/*.o
-web/*.o
 
 # Arquivos temporários do sistema
 .clurg/

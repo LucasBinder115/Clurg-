@@ -181,7 +181,13 @@ O binário é gerado em `bin/clurg`. Para usar:
 ./bin/clurg <comando>
 ```
 
-Ou adicione ao seu PATH:
+Para uma instalação permanente (requer sudo):
+
+```bash
+sudo make install
+```
+
+Ou adicione ao seu PATH manualmente:
 
 ```bash
 export PATH=$PATH:$(pwd)/bin
