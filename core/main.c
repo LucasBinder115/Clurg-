@@ -91,7 +91,12 @@ int main(int argc, char *argv[]) {
   } else if (strcmp(argv[1], "push") == 0) {
     const char *arg1 = (argc >= 3) ? argv[2] : NULL;
     const char *arg2 = (argc >= 4) ? argv[3] : NULL;
+<<<<<<< HEAD
     return clurg_push(arg1, arg2);
+=======
+    const char *arg3 = (argc >= 5) ? argv[4] : NULL;
+    return clurg_push(arg1, arg2, arg3);
+>>>>>>> 6f9723b (Adjusts.)
   } else if (strcmp(argv[1], "clone") == 0) {
     if (argc < 4) {
       fprintf(stderr, "erro: clone requer <project> <remote_url>\n");
